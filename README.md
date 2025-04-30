@@ -68,7 +68,6 @@ Each entry in `assessments:` uses a **list** of key-value pairs.
 - `extra_late_date`: final cutoff date (optional).
 - `extra_late_penalty`: 0–1 multiplier after `extra_late_date` (optional).
 - `extensions`: map of student ID → extra late days.
-- `challenge_weights`: map of challenge ID → weight (sum to 1.0, optional).
 
 ### Other Types
 - **`manual`**: specify `progress` and `credit` directly.
