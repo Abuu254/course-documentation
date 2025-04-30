@@ -1,73 +1,86 @@
 # Adding Course Dojo
 
-To configure a dojo as a course, create a `course.yml` file in the root directory of your dojo repository. This file defines important course details and assessments.
+To configure a dojo as a course, create a `course.yml` file in the root of your dojo repository. This file defines course metadata and assessment rules.
 
 ## Example `course.yml`
 
 ```yaml
-start_date: "2025-01-15"
+start_date: "2025-01-15T00:00:00Z"
 student_id: "NetID"
 
 letter_grades:
   A: 0.9
   B: 0.8
   C: 0.7
-  D: 0.6
-  F: 0.0
 
 assessments:
   - type: checkpoint
     id: hello
-    date: "2025-02-01T23:59:59"
-    grace_period: 24
-    percent_required: 0.5
-    weight: 0.2
+    date: "2025-02-01T23:59:59Z"
+    grace_period: 24          # hours after due date
+    percent_required: 0.5     # 50% of challenges
+    weight: 0.2               # 20% of course grade
 
   - type: due
     id: hello
-    date: "2025-03-01T23:59:59"
-    late_penalty: 0.1
-    weight: 0.2
+    date: "2025-03-01T23:59:59Z"
+    late_penalty: 0.1         # 10% penalty per late day
+    weight: 0.2               # 20% of course grade
 
   - type: due
     id: world
-    date: "2025-04-17T02:30:59"
+    date: "2025-04-17T02:30:59Z"
     late_penalty: 0.1
-    weight: 0.5
+    weight: 0.5               # 50% of course grade
     extensions:
-      student123: 3
+      student123: 3           # 3 extra late days for student123
+
+  - type: helpfulness
+    method: log50
+    unique: true
+    max_credit: 0.05
 
 grading_policy: "Complete all modules and assessments for full credit."
 ```
 
-## Fields Explanation
+## Course Fields
 
-- `start_date`: Course start date in ISO format.
-- `student_id`: Identifier used (e.g., university NetID).
-- `letter_grades`: Defines grade thresholds.
+- **`start_date`**: ISO-8601 datetime when the course begins.
+- **`student_id`**: Label for your student identifier (e.g., NetID).
+- **`letter_grades`**: Map of letter → minimum numeric score.
+- **`grading_policy`**: Human-readable policy summary.
 
-### Assessments
+## Assessment Fields
 
-There are other assessment types supported (manual, extra, helpfulness, memes), but this example includes only two types.
+Each entry in `assessments:` uses a **list** of key-value pairs.
 
-Supported types include:
+- **`type`**: one of `checkpoint`, `due`, `manual`, `extra`, `helpfulness`, `memes`.
+- **`id`**: matches a module’s ID in your `dojo.yml`.
+- **`date`**: deadline for on-time credit.
+- **`weight`**: fraction of overall grade (sum should be ≤ 1.0).
 
-- `checkpoint`: A mid-course assessment with partial completion allowed.
-  - `date`: Due date and time.
-  - `grace_period`: Additional hours allowed after the due date.
-  - `percent_required`: Percentage completion required to pass.
-  - `weight`: Assessment's weight in overall grading.
+### Additional for `checkpoint`
+- `grace_period`: hours allowed after `date` before late punishments.
+- `percent_required`: fraction of challenges to solve.
 
-- `due`: Final assessment with penalties for late submissions.
-  - `date`: Final due date.
-  - `late_penalty`: Penalty applied per late day.
-  - `challenge_weights`: Individual challenge weighting within the assessment.
-  - `extensions`: Specific extensions allowed for students (keyed by student ID).
+### Additional for `due`
+- `late_penalty`: 0–1 multiplier per late day.
+- `extra_late_date`: final cutoff date (optional).
+- `extra_late_penalty`: 0–1 multiplier after `extra_late_date` (optional).
+- `extensions`: map of student ID → extra late days.
+- `challenge_weights`: map of challenge ID → weight (sum to 1.0, optional).
 
-### Assessment IDs and Dojos
+### Other Types
+- **`manual`**: specify `progress` and `credit` directly.
+- **`extra`**: extra-credit component via `credit`.
+- **`helpfulness`**: community credit via `method`, `unique`, `max_credit`.
+- **`memes`**: social credit via `value` and `max_credit`.
 
-Assessment IDs reference specific dojos. Adding dojo modules is done in `dojo.yml`. For information on adding dojos and importing modules and challenges, refer to:
+## Linking Module & Challenge IDs
+
+Assessment `id` keys must correspond to module IDs defined in `dojo.yml`. For details on module/challenge configuration, see:
 
 - [Example Dojo](https://github.com/pwncollege/example-dojo)
-- [Example Import Dojo](https://github.com/pwncollege/example-import-dojo)
+- [Import Dojo Example](https://github.com/pwncollege/example-import-dojo)
 
+---
