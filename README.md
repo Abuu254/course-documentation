@@ -45,35 +45,37 @@ grading_policy: "Complete all modules and assessments for full credit."
 
 ## Course Fields
 
-- **`start_date`**: ISO-8601 datetime when the course begins.
-- **`student_id`**: Label for your student identifier (e.g., NetID).
-- **`letter_grades`**: Map of letter → minimum numeric score.
-- **`grading_policy`**: Human-readable policy summary.
+- **`start_date` (datetime):** When the course officially begins.  
+- **`student_id` (string):** The label shown for each student’s identifier (e.g., “NetID”; defaults to “Identity”).  
+- **`letter_grades` (map [string → float]):** Minimum numeric score required for each letter (e.g., A: 0.93, B: 0.85, …).  
+- **`assessments` (list [map]):** One entry per graded component.
+  
+---
 
-## Assessment Fields
+## Assessment Map Keys
 
-Each entry in `assessments:` uses a **list** of key-value pairs.
+Each entry under `assessments:` must include:
 
-- **`type`**: one of `checkpoint`, `due`, `manual`, `extra`, `helpfulness`, `memes`.
-- **`id`**: matches a module’s ID in your `dojo.yml`.
-- **`date`**: deadline for on-time credit.
-- **`weight`**: fraction of overall grade (sum should be ≤ 1.0).
+- **`type` (string):** One of `checkpoint`, `due`, `manual`, `extra`, `helpfulness`, or `memes`.  
+- **`id` (string):** The module identifier, matching a module in `dojo.yml`.  
+- **`date` (datetime):** Deadline for on-time credit.  
+- **`weight` (float):** Fraction of the overall grade (sum ≤ 1.0).  
+- **`late_penalty` (float):** Multiplier (0–1) applied per late day (only for `due`).
 
-### Additional for `checkpoint`
-- `grace_period`: hours allowed after `date` before late punishments.
-- `percent_required`: fraction of challenges to solve.
+---
 
-### Additional for `due`
-- `late_penalty`: 0–1 multiplier per late day.
-- `extra_late_date`: final cutoff date (optional).
-- `extra_late_penalty`: 0–1 multiplier after `extra_late_date` (optional).
-- `extensions`: map of student ID → extra late days.
+## Supported Assessment Types
 
-### Other Types
-- **`manual`**: specify `progress` and `credit` directly.
-- **`extra`**: extra-credit component via `credit`.
-- **`helpfulness`**: community credit via `method`, `unique`, `max_credit`.
-- **`memes`**: social credit via `value` and `max_credit`.
+- **due:** A deadline-based assessment—students must solve all required challenges in the module by its due date for full credit.  
+- **checkpoint:** An early-progress milestone requiring a subset of a module’s challenges by the checkpoint date.  
+- **manual:** Instructor-graded work (e.g., writeups or projects) where credit is entered by hand.  
+- **extra:** Optional bonus challenges outside the core grading scheme.  
+- **helpfulness:** Community participation credit based on “thank you” posts in Discord.  
+- **memes:** Social engagement credit for posting memes in Discord.  
+
+> Although Dojo supports all of these types, for our course we focused primarily on **due**-type assessments.
+
+---
 
 ## Linking Module & Challenge IDs
 
@@ -83,3 +85,14 @@ Assessment `id` keys must correspond to module IDs defined in `dojo.yml`. For de
 - [Import Dojo Example](https://github.com/pwncollege/example-import-dojo)
 
 ---
+
+## Why This File Is Needed
+
+The official Dojo docs didn’t clearly explain how to configure a course. By examining the code, we discovered that **every** course must have a top-level `course.yml` defining its metadata and assessments. Without it, no grading or course UI features will be enabled.
+
+---
+
+## Contributing Back
+
+It’s my goal to upstream these documentation improvements into the main project. Currently, most Dojo setup docs live in separate repositories—so I’ll identify the correct repo or docs directory, fork it, and submit a pull request to centralize this guidance.  
+```
